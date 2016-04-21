@@ -9,6 +9,6 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  YAMLThatWorks: 69f28b69bebbf67ce980265a2e492f7c0fa0602b
+  YAMLThatWorks: fe7cee14cafd76eb9111adb83500eb9cd558dcd8
 
 COCOAPODS: 0.39.0

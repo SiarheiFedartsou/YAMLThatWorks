@@ -23,13 +23,6 @@ struct membuf : std::streambuf
 
 @implementation YATWSerialization
 
-- (void) fillDictionary:(NSMutableDictionary*)dict node:(const YAML::Node&)node
-{
-    for (const auto& subnode : node) {
-        
-    }
-}
-
 + (NSNumberFormatter*) numberFormatter
 {
     static NSNumberFormatter* formatter = nil;
