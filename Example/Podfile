@@ -1,0 +1,11 @@
+#use_frameworks!
+
+target 'YAMLThatWorks_Example', :exclusive => true do
+  pod 'YAMLThatWorks', :path => '../'
+end
+
+target 'YAMLThatWorks_Tests', :exclusive => true do
+  pod 'YAMLThatWorks', :path => '../'
+
+
+end

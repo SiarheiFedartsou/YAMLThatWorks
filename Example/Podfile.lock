@@ -1,0 +1,17 @@
+PODS:
+  - yaml-cpp (0.5.3)
+  - YAMLThatWorks (0.1.0):
+    - yaml-cpp (~> 0.5.3)
+
+DEPENDENCIES:
+  - YAMLThatWorks (from `../`)
+
+EXTERNAL SOURCES:
+  YAMLThatWorks:
+    :path: ../
+
+SPEC CHECKSUMS:
+  yaml-cpp: 616585b5c9fda794f2065976e22c94b03c01720b
+  YAMLThatWorks: 6c85e695a74a5ed417ce623443d1b5c64f7468d3
+
+COCOAPODS: 0.39.0
