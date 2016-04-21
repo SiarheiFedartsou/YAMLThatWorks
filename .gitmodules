@@ -1,0 +1,6 @@
+[submodule "yaml-cpp"]
+	path = yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
+[submodule "YAMLThatWorks/Classes/yaml-cpp"]
+	path = YAMLThatWorks/Classes/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp

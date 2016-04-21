@@ -8,7 +8,7 @@
 
 @import XCTest;
 
-#import <YAMLThatWorks/YATWSerialization.h>
+@import YAMLThatWorks;
 
 @interface Tests : XCTestCase
 

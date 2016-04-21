@@ -8,34 +8,24 @@
 
 Pod::Spec.new do |s|
   s.name             = "YAMLThatWorks"
-  s.version          = "0.1.0"
-  s.summary          = "A short description of YAMLThatWorks."
+  s.version          = "0.0.1"
+  s.summary          = "Objective C wrapper around yaml-cpp"
+  s.description      = "Objective C YAML Parser implemented as a wrapper around yaml-cpp"
 
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
-
-  s.description      = <<-DESC
-                       DESC
-
-  s.dependency 'yaml-cpp', '~> 0.5.3'
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/YAMLThatWorks"
-  # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
+  s.homepage         = "https://github.com/SiarheiFedartsou/YAMLThatWorks"
   s.license          = 'MIT'
   s.author           = { "Siarhei Fiedartsou" => "siarhei.fedartsou@gmail.com" }
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/YAMLThatWorks.git", :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = { :git => "https://github.com/SiarheiFedartsou/YAMLThatWorks.git", :tag => s.version.to_s }
 
   s.ios.deployment_target = '7.0'
 
   s.source_files = 'YAMLThatWorks/Classes/**/*'
-  s.resource_bundles = {
-    'YAMLThatWorks' => ['YAMLThatWorks/Assets/*.png']
-  }
+  s.exclude_files = ['YAMLThatWorks/Classes/yaml-cpp/test/**/*', 'YAMLThatWorks/Classes/yaml-cpp/util/**/*']
+  s.library = 'c++'
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/YAMLThatWorks/yaml-cpp/include"' }
+  s.header_mappings_dir = 'YAMLThatWorks/Classes/yaml-cpp/include'
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
+  s.public_header_files = 'YAMLThatWorks/Classes/YATWSerialization.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
