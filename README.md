@@ -13,6 +13,7 @@ id object = [YATWSerialization YAMLObjectWithData:data options:0 error:nil]
 ```
 Currently we have only one option:
 * ```YATWSerializationOptionsScalarDisableAutomaticConversion``` - disables automatic conversions of scalars to NSNumber if possible, but supported tags(!!bool, !!float etc) will still work.
+
 ## Requirements
 
 ## Installation
