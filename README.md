@@ -11,18 +11,9 @@ Usage is very similar to ```NSJSONSerialization```:
 ```objectivec
 id object = [YATWSerialization YAMLObjectWithData:data options:0 error:nil]
 ```
-Currently we have two options:
-* ```YATWSerializationOptionsScalarAutomaticConversion``` - automatically recognizes number or bool scalars and returns them with NSNumber type(by the way we don't support YAML type tags yet)
-* ```YATWSerializationOptionsScalarAllowSameKeys``` - allows maps with same keys like this:
-```yaml
-spring:
-    datasource:
-        url: test
-spring:
-    main:
-        headless: true
-```
-In this case this yaml will be represented as array of dictionaries, but not dictionary, in Objective C. If this flag is not specified then deserializer returns dictionary with arbitrary object from list of objects with the same keys.
+Currently we have only one option:
+* ```YATWSerializationOptionsScalarDisableAutomaticConversion``` - disables automatic conversions of scalars to NSNumber if possible, but supported tags(!!bool, !!float etc) will still work.
+
 ## Requirements
 
 ## Installation
