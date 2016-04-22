@@ -94,7 +94,7 @@ struct membuf : std::streambuf
     NSScanner* scanner = [NSScanner scannerWithString:toScan];
     BOOL hexadecimal = [toScan hasPrefix:@"0x"] || [toScan hasPrefix:@"0X"];
     if (hexadecimal) {
-        UInt32 value = 0;
+        unsigned int value = 0;
         if ([scanner scanHexInt:&value]) {
             return @(value);
         } else {
@@ -102,8 +102,8 @@ struct membuf : std::streambuf
             return [NSNull null];
         }
     } else {
-        SInt32 value = 0;
-        if ([scanner scanInt:&value]) {
+        NSInteger value = 0;
+        if ([scanner scanInteger:&value]) {
             return @(value);
         } else {
             // should we use null here? maybe it will be better to return an error?
