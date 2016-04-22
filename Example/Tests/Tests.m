@@ -113,27 +113,6 @@
     
 }
 
-- (void)testSameKeys
-{
-//    NSData* data = [self dataFromYAMLFile:@"same-keys"];
-//    
-//    {
-//        NSError* error = nil;
-//        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
-//        // we cannot check array equality here, because we cannot guarantee order of elements in this case
-//        XCTAssertEqual([result count], 1);
-//        XCTAssertNil(error);
-//    }
-//    
-//    {
-//        NSError* error = nil;
-//        NSArray* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
-//        // we cannot check array equality here, because we cannot guarantee order of elements in this case
-//        XCTAssertEqual([result count], 2);
-//        XCTAssertNil(error);
-//    }
-}
-
 - (void)testSet
 {
     NSData* data = [self dataFromYAMLFile:@"set"];

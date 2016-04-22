@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "YAMLThatWorks"
-  s.version          = "0.0.3"
+  s.version          = "0.0.5"
   s.summary          = "Objective C wrapper around yaml-cpp"
   s.description      = "Objective C YAML Parser implemented as a wrapper around yaml-cpp"
 
@@ -22,9 +22,10 @@ Pod::Spec.new do |s|
   s.source_files = 'YAMLThatWorks/Classes/**/*{.cpp,.h,.m,.mm}'
   s.exclude_files = ['YAMLThatWorks/Classes/yaml-cpp/test/**/*', 'YAMLThatWorks/Classes/yaml-cpp/util/**/*']
   s.library = 'c++'
-  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/YAMLThatWorks/yaml-cpp/include"' }
-  s.header_mappings_dir = 'YAMLThatWorks/Classes/yaml-cpp/include'
-
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Headers/Private/YAMLThatWorks/yaml-cpp/include"',
+                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Headers/Private/YAMLThatWorks/yaml-cpp/include"' }
+  s.header_mappings_dir = 'YAMLThatWorks/Classes/'
+  #s.preserve_paths = 'YAMLThatWorks/Classes/yaml-cpp/include/**/*'
   s.public_header_files = 'YAMLThatWorks/Classes/YATWSerialization.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
