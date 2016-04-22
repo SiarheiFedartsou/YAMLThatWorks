@@ -11,6 +11,10 @@
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 
+#import "YATWUtils.h"
+#import "NSString+YATW.h"
+
+using namespace yaml_that_works;
 
 NSString* const YATWSerializationErrorDomain = @"YATWSerializationErrorDomain";
 
@@ -33,46 +37,135 @@ struct membuf : std::streambuf
     return formatter;
 }
 
-+ (id) objectForScalar:(NSString*)scalar options:(YATWSerializationOptions)options
++ (NSDateFormatter*) iso8601Formatter
 {
-    if (options & YATWSerializationOptionsScalarAutomaticConversion) {
-        if ([scalar isEqualToString:@"true"]) {
-            return @YES;
-        } else if ([scalar isEqualToString:@"false"]) {
-            return @NO;
-        }
-        return [[self numberFormatter] numberFromString:scalar] ?: scalar;
+    static NSDateFormatter* formatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [[NSDateFormatter alloc] init];
+        NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        [formatter setLocale:enUSPOSIXLocale];
+        [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+    });
+    return formatter;
+}
+
+
++ (NSDictionary<NSString*, NSNumber*>*) boolValues
+{
+    static NSDictionary<NSString*, NSNumber*>* bools = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        bools = @{
+                  @"y": @YES, @"Y": @YES, @"yes": @YES, @"Yes": @YES, @"YES": @YES,
+                  @"n": @NO, @"N": @NO, @"no": @NO, @"No": @NO, @"NO": @NO,
+                  @"true": @YES, @"True": @YES, @"TRUE": @YES,
+                  @"false": @NO, @"False": @NO, @"FALSE": @NO,
+                  @"on": @YES, @"On": @YES, @"ON": @YES,
+                  @"off": @NO, @"Off": @NO, @"OFF": @NO
+                  };
+    });
+    return bools;
+}
+
++ (id) objectForTimestampScalar:(NSString*)scalar
+{
+    return [[self iso8601Formatter] dateFromString:scalar];
+}
+
++ (id) objectForFloatScalar:(NSString*)scalar
+{
+    NSCharacterSet* charactersToSkip = [NSCharacterSet characterSetWithCharactersInString:@"_"];
+    NSString* toScan = [scalar yatw_stringBySkippingCharactersInSet:charactersToSkip];
+    NSScanner* scanner = [NSScanner scannerWithString:toScan];
+    double value = 0.0f;
+    if ([scanner scanDouble:&value]) {
+        return @(value);
     } else {
-        return scalar;
+        // should we use null here? maybe it will be better to return an error?
+        return [NSNull null];
+    }
+}
+
++ (id) objectForIntScalar:(NSString*)scalar
+{
+    NSCharacterSet* charactersToSkip = [NSCharacterSet characterSetWithCharactersInString:@"_"];
+    NSString* toScan = [scalar yatw_stringBySkippingCharactersInSet:charactersToSkip];
+    NSScanner* scanner = [NSScanner scannerWithString:toScan];
+    BOOL hexadecimal = [toScan hasPrefix:@"0x"] || [toScan hasPrefix:@"0X"];
+    if (hexadecimal) {
+        UInt32 value = 0;
+        if ([scanner scanHexInt:&value]) {
+            return @(value);
+        } else {
+            // should we use null here? maybe it will be better to return an error?
+            return [NSNull null];
+        }
+    } else {
+        SInt32 value = 0;
+        if ([scanner scanInt:&value]) {
+            return @(value);
+        } else {
+            // should we use null here? maybe it will be better to return an error?
+            return [NSNull null];
+        }
+    }
+    
+}
+
++ (id) objectForScalar:(const YAML::Node&)scalarNode options:(YATWSerializationOptions)options
+{
+    NSString* scalar = @(scalarNode.Scalar().c_str());
+    
+    if (IsBinary(scalarNode)) {
+        NSData* binary = [[NSData alloc] initWithBase64EncodedString:scalar options:0];
+        return binary;
+    } else if (IsBool(scalarNode)) {
+        return self.boolValues[scalar] ?: @YES;
+    } else if (IsInt(scalarNode)) {
+        return [self objectForIntScalar:scalar];
+    } else if (IsFloat(scalarNode)) {
+        return [self objectForFloatScalar:scalar];
+    } else if (IsTimestamp(scalarNode)) {
+        return [self objectForTimestampScalar:scalar];
+    } else {
+        if (options & YATWSerializationOptionsScalarDisableAutomaticConversion) {
+            return scalar;
+        } else {
+            if (self.boolValues[scalar]) {
+                return self.boolValues[scalar];
+            }
+            return [[self numberFormatter] numberFromString:scalar] ?: scalar;
+        }
     }
 }
 
 + (id) objectForNode:(const YAML::Node&)node options:(YATWSerializationOptions)options
 {
     if (node.IsMap()) {
-        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:node.size()];
-        for (const auto& subnode : node) {
-            result[[self objectForNode:subnode.first options:options]] = [self objectForNode:subnode.second options:options];
-        }
-        
-        // it is very rare(in my opinion) case when we have map with not unique keys
-        if ((options & YATWSerializationOptionsScalarAllowSameKeys) && node.size() != [result count]) {
-            NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:node.size()];
+        if (IsSet(node)) {
+            NSMutableSet* result = [[NSMutableSet alloc] initWithCapacity:node.size()];
             for (const auto& subnode : node) {
-                NSDictionary* value = [NSDictionary dictionaryWithObject:[self objectForNode:subnode.second options:options] forKey:[self objectForNode:subnode.first options:options]];
+                id value = [self objectForNode:subnode.first options:options];
                 [result addObject:value];
             }
-            return [NSArray arrayWithArray:result];
+            return [NSSet setWithSet:result];
         } else {
+            NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:node.size()];
+            for (const auto& subnode : node) {
+                id key = [self objectForNode:subnode.first options:options];
+                id value = [self objectForNode:subnode.second options:options];
+                result[key] = value;
+            }
             
             return [NSDictionary dictionaryWithDictionary:result];
         }
+        
        
     } else if (node.IsNull()) {
         return [NSNull null];
     } else if (node.IsScalar()) {
-        NSString* scalar = @(node.Scalar().c_str());
-        return [self objectForScalar:scalar options:options];
+        return [self objectForScalar:node options:options];
     } else if (node.IsSequence()) {
         NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:node.size()];
         for (const auto& subnode : node) {
@@ -80,6 +173,7 @@ struct membuf : std::streambuf
         }
         return [NSArray arrayWithArray:result];
     }
+    return nil;
 }
 
 + (id)YAMLObjectWithData:(NSData *)data options:(YATWSerializationOptions)options error:(NSError * _Nullable *)error;

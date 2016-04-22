@@ -1,0 +1,5 @@
+canonical:        !!timestamp 2001-01-01T00:00:00.1Z
+#valid iso8601:    !!timestamp 2001-12-14t21:59:43.10-05:00
+#space separated:  !!timestamp 2001-12-14 21:59:43.10 -5
+#no time zone (Z): !!timestamp 2001-12-15 2:59:43.10
+#date (00:00:00Z): !!timestamp 2002-12-14

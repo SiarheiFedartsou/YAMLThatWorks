@@ -1,0 +1,6 @@
+spring:
+    datasource:
+        url: test
+spring:
+    main:
+        headless: true

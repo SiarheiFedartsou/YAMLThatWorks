@@ -1,0 +1,7 @@
+canonical: !!int 685230
+decimal: !!int +685_230
+negative: !!int -685_230
+octal: !!int 02472256
+hexadecimal: !!int 0x_0A_74_AE
+binary: !!int 0b1010_0111_0100_1010_1110
+#sexagesimal: !!int 190:20:30

@@ -10,7 +10,9 @@
 
 @import YAMLThatWorks;
 
-@interface Tests : XCTestCase
+#import "YATWTestCase.h"
+
+@interface Tests : YATWTestCase
 
 @end
 
@@ -28,20 +30,13 @@
     [super tearDown];
 }
 
-- (NSData*) dataFromYAMLFile:(NSString*)fileName
-{
-    NSBundle* bundle = [NSBundle bundleForClass:[self class]];
-    NSString* path = [bundle pathForResource:fileName ofType:@"yaml"];
-    NSData* data = [NSData dataWithContentsOfFile:path];
-    return data;
-}
 
 - (void)testSimple
 {
     NSData* data = [self dataFromYAMLFile:@"simple"];
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
         NSDictionary* expected = @{@"test1": @"2", @"test2": @"4"};
         XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
@@ -49,7 +44,7 @@
     
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarAutomaticConversion error:&error];
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
         NSDictionary* expected = @{@"test1": @2, @"test2": @4};
         XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
@@ -63,7 +58,7 @@
     
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
         NSDictionary* expected = @{@[@"1", @"2"]: @"10"};
         XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
@@ -71,7 +66,7 @@
     
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarAutomaticConversion error:&error];
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
         NSDictionary* expected = @{@[@1, @2]: @10};
         XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
@@ -84,7 +79,7 @@
     
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
         NSDictionary* expected = @{@"test1": @"2", @"test2": @"test"};
         XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
@@ -92,7 +87,7 @@
     
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarAutomaticConversion error:&error];
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
         NSDictionary* expected = @{@"test1": @2, @"test2": @"test"};
         XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
@@ -105,40 +100,114 @@
         const char* blablabla = "[blablabla";
         NSData* data = [NSData dataWithBytes:blablabla length:sizeof(blablabla)];
         NSError* error = nil;
-        id result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
+        id result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
         XCTAssertNotNil(error);
         XCTAssertNil(result);
     }
     {
         const char* blablabla = "[blablabla";
         NSData* data = [NSData dataWithBytes:blablabla length:sizeof(blablabla)];
-        XCTAssertNoThrow([YATWSerialization YAMLObjectWithData:data options:0 error:nil]);
-        XCTAssertNil([YATWSerialization YAMLObjectWithData:data options:0 error:nil]);
+        XCTAssertNoThrow([YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:nil]);
+        XCTAssertNil([YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:nil]);
     }
     
 }
 
 - (void)testSameKeys
 {
-    NSData* data = [self dataFromYAMLFile:@"same-keys"];
+//    NSData* data = [self dataFromYAMLFile:@"same-keys"];
+//    
+//    {
+//        NSError* error = nil;
+//        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
+//        // we cannot check array equality here, because we cannot guarantee order of elements in this case
+//        XCTAssertEqual([result count], 1);
+//        XCTAssertNil(error);
+//    }
+//    
+//    {
+//        NSError* error = nil;
+//        NSArray* result = [YATWSerialization YAMLObjectWithData:data options:0 error:&error];
+//        // we cannot check array equality here, because we cannot guarantee order of elements in this case
+//        XCTAssertEqual([result count], 2);
+//        XCTAssertNil(error);
+//    }
+}
+
+- (void)testSet
+{
+    NSData* data = [self dataFromYAMLFile:@"set"];
     
     {
         NSError* error = nil;
-        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarAutomaticConversion error:&error];
-        // we cannot check array equality here, because we cannot guarantee order of elements in this case
-        XCTAssertEqual([result count], 1);
+        NSSet* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
+        NSSet* expected = [NSSet setWithArray:@[@"Mark McGwire", @"Sammy Sosa", @"Ken Griff"]];
+        XCTAssertEqualObjects(result, expected);
         XCTAssertNil(error);
     }
+}
+
+- (void)testPairs
+{
+    
+    NSData* data = [self dataFromYAMLFile:@"pairs"];
     
     {
         NSError* error = nil;
-        NSArray* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarAutomaticConversion | YATWSerializationOptionsScalarAllowSameKeys error:&error];
-        // we cannot check array equality here, because we cannot guarantee order of elements in this case
-        XCTAssertEqual([result count], 2);
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
+        NSDictionary* expected = @{@"Block tasks": @[
+                                           @{@"meeting": @"with team."},
+                                           @{@"meeting": @"with boss."},
+                                           @{@"break": @"lunch."},
+                                           @{@"meeting": @"with client."}
+                                           ],
+                                   @"Flow tasks": @[
+                                           @{@"meeting": @"with team"},
+                                           @{@"meeting": @"with boss"}
+                                           ]};
+        XCTAssertEqualObjects(result, expected);
+        XCTAssertNil(error);
+    }
+}
+
+- (void)testOmap
+{
+    
+    NSData* data = [self dataFromYAMLFile:@"omap"];
+    
+    {
+        NSError* error = nil;
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
+        NSDictionary* expected = @{@"Block tasks": @[
+                                           @{@"meeting": @"with team."},
+                                           @{@"meeting": @"with boss."},
+                                           @{@"break": @"lunch."},
+                                           @{@"meeting": @"with client."}
+                                           ],
+                                   @"Flow tasks": @[
+                                           @{@"meeting": @"with team"},
+                                           @{@"meeting": @"with boss"}
+                                           ]};
+        XCTAssertEqualObjects(result, expected);
+        XCTAssertNil(error);
+    }
+}
+
+- (void) testBinary
+{    NSData* data = [self dataFromYAMLFile:@"binary"];
+    
+    {
+        NSError* error = nil;
+        NSDictionary* result = [YATWSerialization YAMLObjectWithData:data options:YATWSerializationOptionsScalarDisableAutomaticConversion error:&error];
+        XCTAssertTrue([result[@"multiline"] isKindOfClass:[NSData class]]);
+        XCTAssertTrue([result[@"greetings"] isKindOfClass:[NSData class]]);
+        XCTAssertEqualObjects([[NSString alloc] initWithData:result[@"greetings"] encoding:NSUTF8StringEncoding], @"hello");
         XCTAssertNil(error);
     }
     
 }
+
+
 
 @end
 

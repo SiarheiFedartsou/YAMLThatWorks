@@ -1,5 +1,5 @@
 PODS:
-  - YAMLThatWorks (0.0.1)
+  - YAMLThatWorks (0.0.2)
 
 DEPENDENCIES:
   - YAMLThatWorks (from `../`)
@@ -9,6 +9,6 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  YAMLThatWorks: fe7cee14cafd76eb9111adb83500eb9cd558dcd8
+  YAMLThatWorks: 0ebc014f06a43815be8d13392b6d3f280842c0ea
 
 COCOAPODS: 0.39.0

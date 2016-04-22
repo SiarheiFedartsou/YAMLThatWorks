@@ -10,13 +10,11 @@
 
 typedef NS_OPTIONS(NSUInteger, YATWSerializationOptions)
 {
-    YATWSerializationOptionsScalarAutomaticConversion = 1 << 0,
-    YATWSerializationOptionsScalarAllowSameKeys = 1 << 1,
-    
+    YATWSerializationOptionsScalarDisableAutomaticConversion = 1 << 0,
 };
 
-extern NSString* const YATWSerializationErrorDomain;
+extern NSString* _Nonnull const YATWSerializationErrorDomain;
 
 @interface YATWSerialization : NSObject
-+ (id)YAMLObjectWithData:(NSData *)data options:(YATWSerializationOptions)options error:(NSError * _Nullable *)error;
++ (_Nullable id)YAMLObjectWithData:(NSData * _Nonnull)data options:(YATWSerializationOptions)options error:(NSError * _Nullable * _Nullable)error;
 @end

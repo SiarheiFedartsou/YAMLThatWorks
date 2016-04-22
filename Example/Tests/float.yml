@@ -1,0 +1,6 @@
+canonical: !!float 6.8523015e+5
+exponential: !!float 685.230_15e+03
+fixed: !!float 685_230.15
+#sexagesimal: !!float 190:20:30.15
+#negative infinity: !!float -.inf
+#not a number: !!float .NaN
